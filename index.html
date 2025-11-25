@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Scan Barcode</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
+
+<h2>Scan Barcode</h2>
+
+<div id="reader" style="width:300px;"></div>
+<p id="result"></p>
+
+<script>
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbxPoOrKMjfpPhg-OLA1p5zopjy7UJrGwyVW6-NAtQgOMTF50107CVg8Cw8RRHRAoFOG8A/exec";
+
+function sendToSheet(code) {
+    fetch(SHEET_URL, {
+        method: "POST",
+        body: JSON.stringify({ barcode: code }),
+        headers: { "Content-Type": "application/json" }
+    });
+}
+
+function onScanSuccess(decodedText, decodedResult) {
+    document.getElementById("result").innerHTML = "Scanned: " + decodedText;
+
+    sendToSheet(decodedText);
+
+    // stop scanning
+    html5QrcodeScanner.clear();
+}
+
+let html5QrcodeScanner = new Html5QrcodeScanner(
+    "reader",
+    { fps: 10, qrbox: 250 },
+    false
+);
+html5QrcodeScanner.render(onScanSuccess);
+</script>
+
+</body>
+</html>
